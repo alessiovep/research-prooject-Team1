@@ -1,0 +1,28 @@
+template_researchpaper_2TIW.docx
+template_researchpaper_2TIW.md
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+# Node / Vue
+node_modules/
+dist/
+.vite/
+*.local
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
