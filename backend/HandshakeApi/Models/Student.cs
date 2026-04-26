@@ -1,8 +1,9 @@
 ﻿using System;
+namespace HandshakeApi.Models;
 
-public class Class1
+public class Student
 {
-	public Class1()
-	{
-	}
+	public int Id { get; set; }
+	public string FullName { get; set; } = string.Empty;
+	public string Email { get; set; } = string.Empty ;
 }

@@ -1,8 +1,13 @@
 ﻿using System;
+namespace HandshakeApi.Models;
 
-public class Class1
+public class ScanEvent
 {
-	public Class1()
-	{
-	}
+
+    public int Id { get; set; }
+    public int StudentId { get; set; }
+    public int CompanyId { get; set; }
+    public DateTime ScannedAt { get; set; }
+
 }
+

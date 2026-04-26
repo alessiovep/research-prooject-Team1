@@ -1,8 +1,9 @@
 ﻿using System;
+namespace HandshakeApi.Models;
 
-public class Class1
+
+public class Company
 {
-	public Class1()
-	{
-	}
+	public int Id { get; set; }
+	public string Name { get; set; } = string.Empty;
 }
