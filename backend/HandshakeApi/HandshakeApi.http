@@ -1,4 +1,4 @@
-@HandshakeApi_HostAddress = http://localhost:5194
+@HandshakeApi_HostAddress = http://localhost:5142
 
 GET {{HandshakeApi_HostAddress}}/weatherforecast/
 Accept: application/json
