@@ -47,7 +47,7 @@ public class StudentsController : ControllerBase
         var student = await _db.Students.FindAsync(id);
         if (student is null) return NotFound();
 
-        var token = $"student-{student.Id}";
+        var token = $"student:{student.Id}";
 
         return new { studentId = student.Id, token };
     }
