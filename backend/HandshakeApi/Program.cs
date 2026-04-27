@@ -9,6 +9,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=handshake.db"));
+    
+builder.Services.AddSingleton<HandshakeApi.Services.TokenService>();
+
 
 builder.Services.AddCors(options =>
 {
