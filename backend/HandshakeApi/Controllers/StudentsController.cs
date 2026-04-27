@@ -1,5 +1,6 @@
 ﻿using HandshakeApi.Data;
 using HandshakeApi.Models;
+using HandshakeApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,10 +11,12 @@ namespace HandshakeApi.Controllers;
 public class StudentsController : ControllerBase
 {
     private readonly AppDbContext _db;
+    private readonly TokenService _tokens;
 
-    public StudentsController(AppDbContext db)
+    public StudentsController(AppDbContext db, TokenService tokens)
     {
         _db = db;
+        _tokens = tokens;
     }
 
     public record CreateStudentRequest(string FullName, string Email);
@@ -47,7 +50,7 @@ public class StudentsController : ControllerBase
         var student = await _db.Students.FindAsync(id);
         if (student is null) return NotFound();
 
-        var token = $"student:{student.Id}";
+        var token = _tokens.Generate(student.Id);
 
         return new { studentId = student.Id, token };
     }
