@@ -1,8 +1,8 @@
 using HandshakeApi.Data;
 using HandshakeApi.Models;
+using HandshakeApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
 
 namespace HandshakeApi.Controllers;
 
@@ -11,10 +11,12 @@ namespace HandshakeApi.Controllers;
 public class ScansController : ControllerBase
 {
     private readonly AppDbContext _db;
+    private readonly TokenService _tokens;
 
-    public ScansController(AppDbContext db)
+    public ScansController(AppDbContext db, TokenService tokens)
     {
         _db = db;
+        _tokens = tokens;
     }
 
     public record CreateScanRequest(int CompanyId, string Token);
@@ -22,18 +24,9 @@ public class ScansController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ScanEvent>> Create(CreateScanRequest request)
     {
-        // nu enkel token formaat als student id en nadien vervangen met dynamisch token met expiry
-        if (!request.Token.StartsWith("student:"))
-        return BadRequest(new { error = "invalid token format"});
+        if (!_tokens.TryConsume(request.Token, out var studentId, out var error))
+        return BadRequest(new { error });
 
-        var parts = request.Token.Split(':');
-
-        if (parts.Length != 2)
-        return BadRequest(new { error = "invalid token format"});
-
-        if (!int.TryParse(parts[1], out var studentId))
-        return BadRequest(new { error = "Invalid token payload" });
-        
         var student = await _db.Students.FindAsync(studentId);
         if (student == null) return NotFound(new { error = "Student not found" });
 
@@ -42,9 +35,9 @@ public class ScansController : ControllerBase
 
         var scan = new ScanEvent
         {
-            StudentId = studentId,
-            CompanyId = request.CompanyId,
-            ScannedAt = DateTime.UtcNow
+        StudentId = studentId,
+        CompanyId = request.CompanyId,
+        ScannedAt = DateTime.UtcNow
         };
 
         _db.ScanEvents.Add(scan);
