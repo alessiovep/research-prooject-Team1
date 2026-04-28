@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import QRCode from 'qrcode'
 import { api} from "@/api";
 
@@ -9,9 +9,14 @@ const email = ref('')
 const student = ref(null)
 const qrToken = ref(null)
 const qrDataUrl = ref(null)
+const secondsLeft = ref(0)
 
 const loading = ref(false)
 const errorMessage = ref(null)
+
+const REFRESH_SECONDS = 15
+let refreshInterval = null
+let countdownInterval = null
 
 async function register() {
   errorMessage.value = null
@@ -21,11 +26,9 @@ async function register() {
       fullName: fullName.value,
       email: email.value
     })
+    await refreshQrToken()
+    startAutoRefresh()
 
-    const tokenResponse = await api.getStudentQrToken(student.value.id)
-    qrToken.value = tokenResponse.token
-
-    qrDataUrl.value = await QRCode.toDataURL(qrToken.value, { width: 256 })
   } catch (err) {
     errorMessage.value = err.message
   } finally {
@@ -33,14 +36,40 @@ async function register() {
   }
 }
 
+async function refreshQrToken() {
+  const tokenResponse = await api.getStudentQrToken(student.value.id)
+  qrToken.value = tokenResponse.token
+  qrDataUrl.value = await QRCode.toDataURL(qrToken.value, { width: 256 })
+  secondsLeft.value = REFRESH_SECONDS
+}
+
+function startAutoRefresh() {
+  stopAutoRefresh()
+  refreshInterval = setInterval(refreshQrToken, REFRESH_SECONDS * 1000)
+  countdownInterval = setInterval(() => {
+    if (secondsLeft.value > 0) secondsLeft.value--
+  }, 1000)
+}
+
+function stopAutoRefresh() {
+  if (refreshInterval) clearInterval(refreshInterval)
+  if (countdownInterval) clearInterval(countdownInterval)
+  refreshInterval = null
+  countdownInterval = null
+}
+
 function reset() {
+  stopAutoRefresh()
   fullName.value = ''
   email.value = ''
   student.value = null
   qrToken.value = null
   qrDataUrl.value = null
+  secondsLeft.value = 0
   errorMessage.value = null
 }
+
+onUnmounted(stopAutoRefresh)
 
 </script>
 
@@ -65,6 +94,9 @@ function reset() {
     <p>Geregistreerd als <strong>{{ student.fullName }}</strong> (id {{ student.id }})</p>
     <p>Toon deze QR-code aan een bedrijf:</p>
     <img v-if="qrDataUrl" :src="qrDataUrl" alt="QR code" />
+    <p class="countdown">
+      Vernieuwt over <strong>{{ secondsLeft }}</strong> seconde(n)
+    </p>
     <p class="token">Token: <code>{{ qrToken }}</code></p>
     <button @click="reset">Reset</button>
   </div>
@@ -99,9 +131,15 @@ button {
   align-items: flex-start;
   gap: 0.75rem;
 }
+.countdown {
+  font-size: 0.95rem;
+  color: #444;
+}
 .token {
   font-size: 0.85rem;
   color: #555;
+  word-break: break-all;
+  max-width: 320px;
 }
 .error {
   color: crimson;
