@@ -8,6 +8,7 @@ public class ScanEvent
     public int StudentId { get; set; }
     public int CompanyId { get; set; }
     public DateTime ScannedAt { get; set; }
+    public bool IsOfflineSynced { get; set; }
 
 }
 

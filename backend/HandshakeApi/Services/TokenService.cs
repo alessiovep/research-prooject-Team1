@@ -2,23 +2,26 @@ using System.Collections.Concurrent;
 
 namespace HandshakeApi.Services;
 
-
 public class TokenService
 {
     private static readonly TimeSpan Lifetime = TimeSpan.FromSeconds(20);
 
-    // token => wanneer die verloopt + voor welke student
     private readonly ConcurrentDictionary<string, ActiveToken> _tokens = new();
 
     public string Generate(int studentId)
     {
+        var now = DateTime.UtcNow;
         var token = $"student:{studentId}:{Guid.NewGuid()}";
-        var expiresAt = DateTime.UtcNow.Add(Lifetime);
-        _tokens[token] = new ActiveToken(studentId, expiresAt);
+        _tokens[token] = new ActiveToken(studentId, now, now.Add(Lifetime));
         return token;
     }
 
     public bool TryConsume(string token, out int studentId, out string error)
+    {
+        return TryConsumeAt(token, DateTime.UtcNow, out studentId, out error);
+    }
+
+    public bool TryConsumeAt(string token, DateTime scannedAt, out int studentId, out string error)
     {
         studentId = 0;
         error = "";
@@ -29,18 +32,23 @@ public class TokenService
             return false;
         }
 
-        if (DateTime.UtcNow > active.ExpiresAt)
+        if (scannedAt < active.IssuedAt)
         {
-            _tokens.TryRemove(token, out _);
-            error = "Token verlopen";
+            error = "Scan-tijd ligt vóór token-uitgifte";
             return false;
         }
 
-        // Eénmalig gebruik: token wordt verwijderd zodra hij geconsumeerd is.
+        if (scannedAt > active.ExpiresAt)
+        {
+            _tokens.TryRemove(token, out _);
+            error = "Token was verlopen op moment van scannen";
+            return false;
+        }
+
         _tokens.TryRemove(token, out _);
         studentId = active.StudentId;
         return true;
     }
 
-    private record ActiveToken(int StudentId, DateTime ExpiresAt);
+    private record ActiveToken(int StudentId, DateTime IssuedAt, DateTime ExpiresAt);
 }

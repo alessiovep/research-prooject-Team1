@@ -19,13 +19,16 @@ public class ScansController : ControllerBase
         _tokens = tokens;
     }
 
-    public record CreateScanRequest(int CompanyId, string Token);
+    public record CreateScanRequest(int CompanyId, string Token, DateTime? ScannedAt);
 
     [HttpPost]
     public async Task<ActionResult<ScanEvent>> Create(CreateScanRequest request)
     {
-        if (!_tokens.TryConsume(request.Token, out var studentId, out var error))
-        return BadRequest(new { error });
+        var scannedAt = request.ScannedAt?.ToUniversalTime() ?? DateTime.UtcNow;
+        var isOfflineSynced = request.ScannedAt.HasValue;
+
+        if (!_tokens.TryConsumeAt(request.Token, scannedAt, out var studentId, out var error))
+            return BadRequest(new { error });
 
         var student = await _db.Students.FindAsync(studentId);
         if (student == null) return NotFound(new { error = "Student not found" });
@@ -35,15 +38,16 @@ public class ScansController : ControllerBase
 
         var scan = new ScanEvent
         {
-        StudentId = studentId,
-        CompanyId = request.CompanyId,
-        ScannedAt = DateTime.UtcNow
+            StudentId = studentId,
+            CompanyId = request.CompanyId,
+            ScannedAt = scannedAt,
+            IsOfflineSynced = isOfflineSynced
         };
 
         _db.ScanEvents.Add(scan);
         await _db.SaveChangesAsync();
         return CreatedAtAction(nameof(GetById), new { id = scan.Id }, scan);
-    }
+}
 
     [HttpGet("{id}")]
     public async Task<ActionResult<ScanEvent>> GetById(int id)
