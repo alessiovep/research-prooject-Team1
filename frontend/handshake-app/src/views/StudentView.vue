@@ -5,6 +5,7 @@ import { api} from "@/api";
 
 const fullName = ref('')
 const email = ref('')
+const consentGiven = ref(false)
 
 const student = ref(null)
 const qrToken = ref(null)
@@ -24,7 +25,8 @@ async function register() {
   try {
     student.value = await api.createStudent({
       fullName: fullName.value,
-      email: email.value
+      email: email.value,
+      consentGiven: consentGiven.value
     })
     await refreshQrToken()
     startAutoRefresh()
@@ -85,7 +87,11 @@ onUnmounted(stopAutoRefresh)
       Email
       <input v-model="email" type="email" required />
     </label>
-    <button type="submit" :disabled="loading">
+        <label class="consent-label">
+      <input type="checkbox" v-model="consentGiven" />
+      Ik ga akkoord met de verwerking van mijn persoonsgegevens voor dit event
+    </label>
+    <button type="submit" :disabled="loading || !consentGiven">
       {{ loading ? 'Bezig…' : 'Registreer' }}
     </button>
   </form>
@@ -145,4 +151,11 @@ button {
   color: crimson;
   margin-top: 1rem;
 }
+.consent-label {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
 </style>

@@ -19,15 +19,19 @@ public class StudentsController : ControllerBase
         _tokens = tokens;
     }
 
-    public record CreateStudentRequest(string FullName, string Email);
+    public record CreateStudentRequest(string FullName, string Email, bool ConsentGiven);
 
     [HttpPost]
     public async Task<ActionResult<Student>> Create(CreateStudentRequest request)
     {
+        if (!request.ConsentGiven)
+            return BadRequest(new { error = "Toestemming is vereist" });
+
         var student = new Student
         {
             FullName = request.FullName,
-            Email = request.Email
+            Email = request.Email,
+            ConsentGivenAt = DateTime.UtcNow
         };
 
         _db.Students.Add(student);
