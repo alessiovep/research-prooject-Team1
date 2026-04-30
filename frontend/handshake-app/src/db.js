@@ -1,3 +1,5 @@
+import { encrypt, decrypt } from '@/crypto'
+
 const DB_NAME = 'handshake-poc'
 const DB_VERSION = 1
 const STORE = 'scan-queue'
@@ -23,9 +25,10 @@ function tx(db, mode) {
 }
 
 export async function addScan(scan) {
+  const { iv, ciphertext } = await encrypt(JSON.stringify(scan))
   const db = await openDb()
   return new Promise((resolve, reject) => {
-    const request = tx(db, 'readwrite').add(scan)
+    const request = tx(db, 'readwrite').add({ iv, ciphertext })
     request.onsuccess = () => resolve(request.result)
     request.onerror = () => reject(request.error)
   })
@@ -33,11 +36,17 @@ export async function addScan(scan) {
 
 export async function getQueuedScans() {
   const db = await openDb()
-  return new Promise((resolve, reject) => {
+  const records = await new Promise((resolve, reject) => {
     const request = tx(db, 'readonly').getAll()
     request.onsuccess = () => resolve(request.result)
     request.onerror = () => reject(request.error)
   })
+  return Promise.all(
+    records.map(async (record) => {
+      const plaintext = await decrypt({ iv: record.iv, ciphertext: record.ciphertext })
+      return { id: record.id, ...JSON.parse(plaintext) }
+    })
+  )
 }
 
 export async function removeScan(id) {
