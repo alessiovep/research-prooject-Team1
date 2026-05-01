@@ -89,7 +89,14 @@ onUnmounted(stopAutoRefresh)
     </label>
         <label class="consent-label">
       <input type="checkbox" v-model="consentGiven" />
-      Ik ga akkoord met de verwerking van mijn persoonsgegevens voor dit event
+      <span>
+        Ik geef PXL Hogeschool toestemming om mijn naam, e-mailadres en eventueel
+        mijn cv te gebruiken voor dit event en te delen met bedrijven die mijn
+        QR-code scannen. Mijn gegevens worden maximaal 3 maanden na het event
+        bewaard. Ik kan mijn toestemming altijd intrekken en heb het recht om
+        mijn gegevens in te zien, te corrigeren of te laten verwijderen via
+        privacy@pxl.be.
+      </span>
     </label>
     <button type="submit" :disabled="loading || !consentGiven">
       {{ loading ? 'Bezig…' : 'Registreer' }}
@@ -153,9 +160,15 @@ button {
 }
 .consent-label {
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.5rem;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  max-width: 320px;
+}
+.consent-label input[type="checkbox"] {
+  margin-top: 0.2rem;
+  flex-shrink: 0;
 }
 
 </style>
