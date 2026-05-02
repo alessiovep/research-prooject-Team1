@@ -33,6 +33,11 @@
 
 **Resultaat:** geslaagd — ScanEvent aangemaakt in database.
 
+**Bewijs:** screenshots van ingelogde student en het scanmoment van het bedrijf.
+
+![Registratie student](..\screenshots\Test1_1.png)
+![Registratie bij bedrijf](..\screenshots\Test1_2.png)
+
 ### Test 2 — Replay attack (zelfde token tweemaal)
 
 **Stappen:**
@@ -44,6 +49,8 @@
 **Resultaat:** geslaagd — token verwijderd uit server-state na eerste gebruik, tweede poging wordt geweigerd.
 
 **Bewijs:** screenshot van de error in browser/Swagger.
+
+![Foutmelding voor dubbel scannen](..\screenshots\Test2_1.png)
 
 ### Test 3 — Verlopen token
 
@@ -58,6 +65,8 @@
 
 **Bewijs:** screenshot van de error.
 
+![Foutmelding voor een verlopen token](..\screenshots\Test3_1.png)
+
 ### Test 4 — Verzonnen token
 
 **Stappen:**
@@ -66,6 +75,10 @@
 **Verwacht resultaat:** server weigert, `400 Bad Request` met error `"Token onbekend of al gebruikt"`.
 
 **Resultaat:** geslaagd — niet-uitgegeven tokens komen niet voor in server-state.
+
+**Bewijs:** screenshot van de error.
+
+![Foutmelding voor verzonnen token](..\screenshots\Test4_1.png)
 
 ### Test 5 — Auto-refresh op de student-pagina
 
@@ -78,6 +91,10 @@
 
 **Resultaat:** geslaagd — 4 calls geobserveerd in 60 seconden, telkens nieuwe GUID, QR-image herrendert visueel.
 
+**Bewijs:** screenshot van 4 nieuw aangemaakte tokens.
+
+![Aantonen aanmaak nieuwe tokens](..\screenshots\Test5_1.png)
+
 ## Conclusie deelvraag 1
 
 De combinatie van **expiry + eenmalig gebruik + auto-refresh** beschermt tegen de twee belangrijkste aanvalsvectoren beschreven in bron 2:
@@ -88,8 +105,3 @@ De combinatie van **expiry + eenmalig gebruik + auto-refresh** beschermt tegen d
 **Beperkingen die in productie verholpen moeten worden:**
 - Server-state in geheugen overleeft geen herstart of multi-instance deployment → in productie: Redis of cryptografisch getekende JWT zodat geen state nodig is.
 - 20-seconden expiry vraagt continue netwerk-verbinding voor de student → conflicteert deels met deelvraag 2 (offline-first). Resolutie volgt in fase 3.
-
-
-*TODO - nog screenshots toevoegen
-bv
-![Test 2](screenshots/test-2-replay.png)
