@@ -35,8 +35,8 @@
 
 **Bewijs:** screenshots van ingelogde student en het scanmoment van het bedrijf.
 
-![Registratie student](..\screenshots\Test1_1.png)
-![Registratie bij bedrijf](..\screenshots\Test1_2.png)
+![Registratie student](../screenshots/Test1_1.png)
+![Registratie bij bedrijf](../screenshots/Test1_2.png)
 
 ### Test 2 — Replay attack (zelfde token tweemaal)
 
@@ -50,7 +50,7 @@
 
 **Bewijs:** screenshot van de error in browser/Swagger.
 
-![Foutmelding voor dubbel scannen](..\screenshots\Test2_1.png)
+![Foutmelding voor dubbel scannen](../screenshots/Test2_1.png)
 
 ### Test 3 — Verlopen token
 
@@ -65,7 +65,7 @@
 
 **Bewijs:** screenshot van de error.
 
-![Foutmelding voor een verlopen token](..\screenshots\Test3_1.png)
+![Foutmelding voor een verlopen token](../screenshots/Test3_1.png)
 
 ### Test 4 — Verzonnen token
 
@@ -78,7 +78,7 @@
 
 **Bewijs:** screenshot van de error.
 
-![Foutmelding voor verzonnen token](..\screenshots\Test4_1.png)
+![Foutmelding voor verzonnen token](../screenshots/Test4_1.png)
 
 ### Test 5 — Auto-refresh op de student-pagina
 
@@ -93,7 +93,7 @@
 
 **Bewijs:** screenshot van 4 nieuw aangemaakte tokens.
 
-![Aantonen aanmaak nieuwe tokens](..\screenshots\Test5_1.png)
+![Aantonen aanmaak nieuwe tokens](../screenshots/Test5_1.png)
 
 ## Conclusie deelvraag 1
 
