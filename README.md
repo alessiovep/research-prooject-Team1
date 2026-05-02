@@ -50,7 +50,15 @@ npm install
 npm run dev
 ```
 
-SPA op `http://localhost:5173`. De API URL staat in `.env.development` (`VITE_API_URL=http://localhost:5142`).
+SPA op `http://localhost:5173`.
+
+**Eerste keer:** maak `frontend/handshake-app/.env.development` aan met:
+
+```dotenv
+VITE_API_URL=http://localhost:5142
+```
+
+Dit bestand staat in `.gitignore` en wordt dus niet mee-gekloond. Zonder deze variabele gaan API-calls naar de Vite dev server zelf en krijg je 404's. Herstart `npm run dev` na het aanmaken — Vite leest env vars alleen bij startup.
 
 ### Overige scripts (frontend)
 
