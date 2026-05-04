@@ -52,12 +52,16 @@ De checkbox is frontend-validatie (UX), maar de backend valideert ook. Hierdoor 
 | 1.2 | `await crypto.subtle.exportKey('raw', k)` | Exception: *"key is not extractable"* | ✅ |
 | 1.3 | Page refresh → `getKey()` opnieuw | Dezelfde sleutel geladen uit `handshake-keys` IndexedDB | ✅ |
 
+![non-extrable-key](../screenshots/Non-extractable-key.png)
+
 ### Test 2 — Encryptie en decryptie
 
 | # | Stap | Verwacht | Resultaat |
 |---|---|---|---|
 | 2.1 | `encrypt("hello world")` → `{ iv, ciphertext }` | Binaire output, niet leesbaar als tekst | ✅ |
 | 2.2 | `decrypt({ iv, ciphertext })` | Originele string `"hello world"` terug | ✅ |
+
+![encryptie](../screenshots/encryptie.png)
 
 ### Test 3 — IndexedDB toont versleutelde data
 
@@ -67,6 +71,10 @@ De checkbox is frontend-validatie (UX), maar de backend valideert ook. Hierdoor 
 | 3.2 | Scan via `/scanner` | Geel vakje, queue-teller +1 | ✅ |
 | 3.3 | DevTools → Application → IndexedDB → `handshake-poc` → `scan-queue` | Record bevat `iv` en `ciphertext`, **geen leesbare** `companyId`, `token` of `scannedAt` | ✅ |
 
+Bij directe inspectie van IndexedDB via de DevTools is de inhoud van de wachtrij onleesbaar (binaire ciphertext in plaats van JSON met namen/CV-data). Hiermee is het concrete OWASP M9-risico van onveilige lokale opslag afgedekt.
+
+![Inspectie IndexedDB — versleutelde scan-queue](../screenshots/inspectie.png)
+
 ### Test 4 — Consent flow frontend
 
 | # | Stap | Verwacht | Resultaat |
@@ -75,12 +83,30 @@ De checkbox is frontend-validatie (UX), maar de backend valideert ook. Hierdoor 
 | 4.2 | Checkbox aanvinken | Knop wordt actief | ✅ |
 | 4.3 | Registreren met aangevinkte checkbox | Student aangemaakt, `consentGivenAt` in response | ✅ |
 
+Registratie zonder aangevinkte checkbox wordt geblokkeerd op de frontend — de knop blijft uitgeschakeld tot de gebruiker expliciet toestemming geeft.
+
+![Consent verplicht — knop uitgeschakeld zonder checkbox](../screenshots/consent.png)
+
 ### Test 5 — Consent validatie op backend
 
 | # | Stap | Verwacht | Resultaat |
 |---|---|---|---|
 | 5.1 | POST `/api/students` met `"consentGiven": false` | 400 Bad Request, `"Toestemming is vereist"` | ✅ |
 | 5.2 | POST `/api/students` met `"consentGiven": true` | 201 Created, `consentGivenAt` aanwezig als UTC-timestamp | ✅ |
+
+![Consent-validatie](../screenshots/consent-validatie1.png)
+
+![Consent-validatie](../screenshots/consent-validatie2.png)
+
+### Test 6 — Synchronisatie na netwerkherstel
+
+Na herstel van de netwerkverbinding wordt de versleutelde wachtrij correct ontsleuteld, doorgestuurd naar de backend en lokaal opgeruimd, zonder data-integriteitsfouten.
+
+![Synchronisatie — queue vóór sync](../screenshots/synchronisatie1.png)
+
+![Synchronisatie — sync in uitvoering](../screenshots/synchronisatie2.png)
+
+![Synchronisatie — queue leeg na sync](../screenshots/synchronisatie3.png)
 
 ## Conclusie deelvraag 3
 

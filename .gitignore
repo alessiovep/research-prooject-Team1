@@ -33,3 +33,7 @@ dist/
 .DS_Store
 Thumbs.db
 CLAUDE.md
+presentations/handshake-research-presentatie.pptx
+.gitignore
+AGENTS.md
+presentations/spreeknotities-handshake.md
