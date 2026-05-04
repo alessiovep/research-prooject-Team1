@@ -53,12 +53,24 @@ Voor de POC wordt dit als acceptabele beperking erkend.
 | 1.2 | POST /api/scans **met** `scannedAt = nu+5s` | 201, `isOfflineSynced: true` | ✅ |
 | 1.3 | POST /api/scans **met** `scannedAt = nu+30s` (na expiry) | 400 *"Token was verlopen op moment van scannen"* | ✅ |
 
+**Bewijs:** screenshots van de drie backend-scenarios in Postman.
+
+![POST zonder scannedAt](../screenshots/DV2_Test1_1.png)
+![POST met scannedAt binnen geldige window](../screenshots/DV2_Test1_2.png)
+![POST met scannedAt na expiry](../screenshots/DV2_Test1_3.png)
+
 ### Test 2 — Frontend: online scan via UI
 
 | # | Stap | Verwacht | Resultaat |
 |---|---|---|---|
 | 2.1 | `/scanner` met netwerk → token plakken → Registreer | 201, groen vakje, **isOfflineSynced=false** in DB | ✅ |
 | 2.2 | `/scanner` online → `garbage` als token | Rode error, **niets** in IndexedDB queue | ✅ |
+
+**Bewijs:** screenshots van de online scan, controle in de database/API en de foutmelding bij een ongeldige token.
+
+![Online scan via scanner UI](../screenshots/DV2_Test2_1.png)
+![Online scan in database/API](../screenshots/DV2_Test2_1_1.png)
+![Ongeldige token wordt niet gequeued](../screenshots/DV2_Test2_2.png)
 
 ### Test 3 — Frontend: offline scans queueen
 
@@ -68,6 +80,12 @@ Voor de POC wordt dit als acceptabele beperking erkend.
 | 3.2 | 2 verschillende tokens scannen | Geel vakje per scan, banner "2 scan(s) in wachtrij" | ✅ |
 | 3.3 | Inspectie IndexedDB → handshake-poc → scan-queue | 2 records met `companyId`, `token`, `scannedAt` | ✅ |
 
+**Bewijs:** screenshots van offline modus, de queue-banner en de IndexedDB queue.
+
+![Scanner offline in DevTools](../screenshots/DV2_Test3_1.png)
+![Twee offline scans in wachtrij](../screenshots/DV2_Test3_2.png)
+![IndexedDB scan-queue met queued records](../screenshots/DV2_Test3_3.png)
+
 ### Test 4 — Automatische sync bij netwerkherstel
 
 | # | Stap | Verwacht | Resultaat |
@@ -75,6 +93,12 @@ Voor de POC wordt dit als acceptabele beperking erkend.
 | 4.1 | DevTools terug op "No throttling" | `online` event vuurt | ✅ |
 | 4.2 | Wachten op auto-sync | Banner verdwijnt, melding "X gesynchroniseerd" | ✅ |
 | 4.3 | GET /api/scans | Beide scans aanwezig met `isOfflineSynced: true` | ✅ |
+
+**Bewijs:** screenshots van netwerkherstel, automatische synchronisatie en de gesynchroniseerde scans in de API/database.
+
+![Netwerk terug online](../screenshots/DV2_Test4_1.png)
+![Automatische sync uitgevoerd](../screenshots/DV2_Test4_2.png)
+![Gesynchroniseerde scans met isOfflineSynced true](../screenshots/DV2_Test4_3.png)
 
 ### Test 5 — Manuele sync via knop
 
@@ -87,6 +111,10 @@ Voor de POC wordt dit als acceptabele beperking erkend.
 | # | Stap | Verwacht | Resultaat |
 |---|---|---|---|
 | 6.1 | Offline → scan → wacht 30s → online → sync | Server weigert (token-state opgeruimd), record uit queue verwijderd, melding "0 gesynchroniseerd · 1 geweigerd door server" | ✅ |
+
+**Bewijs:** screenshot van de late sync waarbij de server de verlopen token weigert en de queue wordt opgeruimd.
+
+![Late sync met verlopen token geweigerd](../screenshots/DV2_Test6_1.png)
 
 ## Conclusie deelvraag 2
 
