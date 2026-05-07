@@ -1,0 +1,12 @@
+Handshake is a proof of concept for student identification at networking events.
+
+First, fraud prevention.
+Each student receives a rotating QR token. The token expires quickly and can only be used once.
+
+Second, offline reliability.
+If the scanner loses network connection, scans are stored locally and synchronized when the connection returns.
+
+Third, GDPR.
+The app requires explicit consent, and queued scan data is encrypted locally using AES-GCM.
+
+Together, the proof of concept shows a secure, offline-capable, and privacy-aware handshake flow.

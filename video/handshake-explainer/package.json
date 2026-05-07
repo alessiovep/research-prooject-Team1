@@ -1,0 +1,23 @@
+{
+  "name": "handshake-explainer-video",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "audio": "node scripts/generate-audio.mjs",
+    "voiceover": "node scripts/generate-voiceover.mjs",
+    "voiceover:pace": "node scripts/pace-elevenlabs-voiceover.mjs",
+    "studio": "remotion studio src/index.jsx",
+    "still": "remotion still src/index.jsx HandshakeExplainer --frame=360 --scale=0.4 out/preview.png",
+    "render": "remotion render src/index.jsx HandshakeExplainer out/handshake-explainer.mp4 --codec=h264 --crf=18",
+    "render:audio": "remotion render src/index.jsx HandshakeExplainer out/handshake-explainer-audio.mp4 --codec=h264 --crf=18",
+    "render:voiceover": "remotion render src/index.jsx HandshakeExplainerVoiceover out/handshake-explainer-voiceover.mp4 --codec=h264 --crf=18"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.380",
+    "@remotion/media": "^4.0.457",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "remotion": "^4.0.380"
+  }
+}
